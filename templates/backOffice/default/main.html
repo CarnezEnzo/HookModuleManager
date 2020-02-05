@@ -1,0 +1,130 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Modules'}{/block}
+
+{block name="check-resource"}admin.module{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+<div class="general-block-decorator">
+    <div class="table-responsive">
+        <table class="table table-striped table-condensed table-left-aligned">
+            <caption class="clearfix">
+                {$caption_title|default:{intl l='Modules'}}
+            </caption>
+            <thead>
+            <tr>
+                <th>
+                    {admin_sortable_header
+                    current_order=$module_order
+                    order='id'
+                    reverse_order='id_reverse'
+                    path={url path='/admin/module/HookModuleManager'}
+                    request_parameter_name='module_order'
+                    label="{intl l='ID'}"
+                    }
+                </th>
+
+                <th>
+                    {admin_sortable_header
+                    current_order=$module_order
+                    order='title'
+                    reverse_order='title_reverse'
+                    path={url path='/admin/module/HookModuleManager'}
+                    request_parameter_name='module_order'
+                    label="{intl l='Name'}"
+                    }
+                </th>
+
+                <th>
+                    {admin_sortable_header
+                    current_order=$module_order
+                    order='code'
+                    reverse_order='code_reverse'
+                    path={url path='/admin/module/HookModuleManager'}
+                    request_parameter_name='module_order'
+                    label="{intl l='Code'}"
+                    }
+                </th>
+
+                <th>{intl l="version"}</th>
+
+                {hook name="modules.table-header" location="modules_table_header" }
+
+                <th class="actions">{intl l="Actions"}</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            {$hidden = $smarty.post.hidden|default:'0'}
+
+            <!--id="list"-->
+
+            {loop type="module" name="module.{$module_type}" order={$smarty.get.module_order|default:id} backend_context=1 hidden=$hidden id=$list}
+            {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
+            <tr id="module-{$ID}" {if ! $EXISTS || $MANDATORY}class="warning"{/if}>
+            <td>{$ID}</td>
+            <td>{$TITLE}</td>
+            <td>{$CODE}</td>
+            <td>{$VERSION}</td>
+
+            {hook name="modules.table-row" location="modules_table_row" module_code={$CODE} }
+
+            <td class="actions">
+                {if $module_type == 2}
+                {ifloop rel="area-attached"}
+                {$zones=""}
+                {loop name="area-attached" type="area" module_id=$ID}
+                {$zones="`$zones`, `$NAME`"}
+                {$zone_count=$LOOP_TOTAL}
+                {/loop}
+                {$title={intl l='%count shipping zone(s) are attached to this module: %zones. Click here to change' count={$zone_count}  zones={$zones|ltrim:', '}}}
+                {$btnstyle="btn-info"}
+                {$icon=''}
+                {/ifloop}
+                {elseloop rel="area-attached"}
+                {$title={intl l='No shipping zone attached to this module, click here to attach one'}}
+                {$icon='<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span> '}
+                {$btnstyle="btn-danger"}
+                {/elseloop}
+
+                <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} config-btn-{$ID} btn-area-config" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                {/if}
+
+                {$buttons = []}
+
+                {if $EXISTS}
+
+                {$buttons[] = [
+                'type' => 'config',
+                'class' => "config-btn-$ID",
+                'title' => {intl l='Configure this module'},
+                'href' => {url path="/admin/module/HookModuleManager/details" code=$ID},
+                'auth' => ['resource' => $CODE]
+                ]}
+
+                {/if}
+
+                {include file='renderer/buttons.html' buttons=$buttons}
+            </td>
+            </tr>
+            {/loop}
+            {/loop}
+            {elseloop rel="module.`$module_type`"}
+            <tr>
+                <td colspan="8">
+                    <br />
+                    <div class="alert alert-info">
+                        {intl l="No module of this type was found."}
+                    </div>
+                </td>
+            </tr>
+            {/elseloop}
+            </tbody>
+        </table>
+    </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}{/block}

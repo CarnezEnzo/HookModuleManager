@@ -1,0 +1,120 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a module' d='hookmodulemanager'}{/block}
+
+{block name="check-resource"}admin.module{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+<div class="general-block-decorator">
+    {if $smarty.get.code|default:false && sizeof($options) != 0}
+    {foreach from=$options item=option}
+        <div class="table-responsive">
+            <table class="table table-striped table-condensed table-left-aligned">
+                <caption class="clearfix">
+                    {$caption_title|default:$option->GetId()|cat:" - "|cat:$option->GetName()}
+                </caption>
+                <thead>
+                <tr>
+
+                    <th>
+                        {admin_sortable_header
+                        current_order=$module_order
+                        order='title'
+                        reverse_order='title_reverse'
+                        path={url path='/admin/module/HookModuleManager/details' code=$smarty.get.code}
+                        request_parameter_name='module_order'
+                        label="{intl l='Name'}"
+                        }
+                    </th>
+
+                    <th>
+                        {admin_sortable_header
+                        current_order=$module_order
+                        order='locale'
+                        reverse_order='locale_reverse'
+                        path={url path='/admin/module/HookModuleManager/details' code=$smarty.get.code}
+                        request_parameter_name='module_order'
+                        label="{intl l='Locale'}"
+                        }
+                    </th>
+
+                    <th>
+                        {admin_sortable_header
+                        current_order=$module_order
+                        order='code'
+                        reverse_order='code_reverse'
+                        path={url path='/admin/module/HookModuleManager/details' code=$smarty.get.code}
+                        request_parameter_name='module_order'
+                        label="{intl l='Value'}"
+                        }
+                    </th>
+
+                    {hook name="modules.table-header" location="modules_table_header" }
+
+                </tr>
+                </thead>
+
+                <tbody>
+
+                {$hidden = $smarty.post.hidden|default:'0'}
+
+
+                {loop type="lang" name="lang_available"}
+
+                    {form name="hookmodulemanager.config.form"}
+                        <form method="POST" id="pages-form" action="">
+                            <tr id="module-{$ID}" {if ! $EXISTS || $MANDATORY}class="warning"{/if}>
+                                {form_hidden_fields}
+
+                                {form_field form=$form field='success_url'}
+                                <input type="hidden" name="{$name}"
+                                       value="{navigate to='current'}"/>
+                                {/form_field}
+
+                                {form_field form=$form field="id"}
+                                <div class="form-group">
+                                    <input name="{$name}" value="{$option->GetId()}" type="hidden">
+                                </div>
+                                {/form_field}
+
+                                {form_field form=$form field="locale"}
+                                <div class="form-group">
+                                    <input name="{$name}" value="{$LOCALE}" type="hidden">
+                                </div>
+                                {/form_field}
+
+                                <td>{$TITLE}</td>
+                                <td>{$LOCALE}</td>
+
+
+                                {form_field form=$form field="text"}
+                                <div class="form-group">
+                                    <td><input name="{$name}" value="{$translations[$option->GetId()|cat:$LOCALE]}"></td>
+                                </div>
+                                {/form_field}
+                                <td>
+                                    <input type="submit">
+                                </td>
+                            </tr>
+                        </form>
+                    {/form}
+                {/loop}
+                </tbody>
+            </table>
+            {/foreach}
+        </div>
+    {else}
+        <tr>
+            <td colspan="8">
+                <br />
+                <div class="alert alert-info">
+                    {intl l="No module of this type was found."}
+                </div>
+            </td>
+        </tr>
+    {/if}
+</div>
+{/block}
+
+{block name="javascript-initialization"}{/block}

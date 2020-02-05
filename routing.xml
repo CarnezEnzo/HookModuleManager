@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="ModuleTestEncore.configuration.default" path="/admin/module/ModuleTestEncore">
+        <default key="_controller">ModuleTestEncore\Controller\Configuration::defaultAction</default>
+    </route>
+
+    <route id="ModuleTestEncore.configuration.details" path="/admin/module/ModuleTestEncore/details" methods="get">
+        <default key="_controller">ModuleTestEncore\Controller\Configuration::getOptionsFromModuleAction</default>
+    </route>
+
+    <route id="ModuleTestEncore.configuration.save" path="/admin/module/ModuleTestEncore/details" methods="post">
+        <default key="_controller">ModuleTestEncore\Controller\Configuration::saveAction</default>
+    </route>
+
+</routes>
